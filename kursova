@@ -1,0 +1,33 @@
+file="data.ping"
+net="10.7.180."
+
+if [ ! -s $file ]
+then
+ for (( i=0; i<255; i++))
+   do
+      echo 9
+   done >> $file
+fi
+
+state=( $(cat $file) )
+
+for i in {100..105}
+do 
+	ip="$net$i"
+	ping -c1 $ip &>>/dev/null
+
+	code=$?
+#	echo ip: $ip code: $code state: ${state[$i]}
+
+        if [ ${state[$i]} -ne $code ]
+	then
+		echo $ip $code
+		state[$i]=$code
+	fi 
+
+
+done
+
+echo ${state[@]} > $file
+
+
